@@ -5,10 +5,23 @@ description: Configure Claude Code status line showing path, git branch, model, 
 
 Set up the Claude Code status line by copying the script from this skill and configuring settings.
 
+## Prerequisites
+
+Install `jq` and `git` if not already available:
+
+```bash
+# Debian/Ubuntu
+sudo apt-get install -y jq git
+
+# macOS
+brew install jq git
+```
+
 ## Steps
 
-1. Copy `statusline-command.sh` from this skill's directory to `~/.claude/statusline-command.sh`
-2. Ensure `~/.claude/settings.json` contains:
+1. Ensure `jq` and `git` are installed (see Prerequisites above)
+2. Copy `statusline-command.sh` from this skill's directory to `~/.claude/statusline-command.sh`
+3. Ensure `~/.claude/settings.json` contains:
    ```json
    "statusLine": {
      "type": "command",
@@ -29,4 +42,4 @@ Set up the Claude Code status line by copying the script from this skill and con
 | Model | Bold cyan | Short name: opus, sonnet, haiku |
 | Context | Bold green | Tokens used/total and percentage |
 
-Fields are omitted when data is unavailable. Requires `jq` and `git` on PATH.
+Fields are omitted when data is unavailable.
