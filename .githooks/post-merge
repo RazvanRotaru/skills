@@ -1,0 +1,17 @@
+#!/bin/bash
+# Sync skill directories to ~/.claude/skills/ after git pull
+
+SKILLS_SRC="$(git rev-parse --show-toplevel)"
+SKILLS_DST="$HOME/.claude/skills"
+
+# Ensure destination exists
+mkdir -p "$SKILLS_DST"
+
+# Remove broken symlinks (deleted skills)
+find "$SKILLS_DST" -maxdepth 1 -type l ! -exec test -e {} \; -delete
+
+# Symlink all skill directories
+for dir in "$SKILLS_SRC"/*/; do
+  name="$(basename "$dir")"
+  ln -sfn "$dir" "$SKILLS_DST/$name"
+done
