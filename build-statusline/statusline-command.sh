@@ -34,10 +34,18 @@ git_branch=$(git -C "$raw_cwd" rev-parse --abbrev-ref HEAD 2>/dev/null)
 if [ -n "$git_branch" ]; then
   dirty_count=$(git -C "$raw_cwd" status --porcelain 2>/dev/null | wc -l)
   dirty_count=$(echo "$dirty_count" | tr -d ' ')
+  unpushed=$(git -C "$raw_cwd" log @{u}..HEAD --oneline 2>/dev/null | wc -l)
+  unpushed=$(echo "$unpushed" | tr -d ' ')
+  git_str="⎇ ${git_branch}"
+  suffix=""
   if [ "$dirty_count" -gt 0 ] 2>/dev/null; then
-    git_str="⎇ ${git_branch}[${dirty_count}]"
-  else
-    git_str="⎇ ${git_branch}"
+    suffix="*${dirty_count}"
+  fi
+  if [ "$unpushed" -gt 0 ] 2>/dev/null; then
+    suffix="${suffix} ↑${unpushed}"
+  fi
+  if [ -n "$suffix" ]; then
+    git_str="${git_str}(${suffix})"
   fi
 else
   git_str=""
