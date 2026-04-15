@@ -30,6 +30,7 @@ This will:
 - **write-a-prd** — Create a PRD through user interview, codebase exploration, and module design, then submit as a GitHub issue.
 - **prd-to-issues** — Break a PRD into independently-grabbable GitHub issues using tracer-bullet vertical slices.
 - **grill-me** — Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree.
+- **brainstorm-team-session** — Iterative problem-solving loop that stress-tests a proposed solution through structured refinement. Works for any domain: infra, product, process, strategy, architecture, org design.
 - **ubiquitous-language** — Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities and proposing canonical terms. Saves to `UBIQUITOUS_LANGUAGE.md`.
 
 ### Development Workflow
