@@ -7,4 +7,6 @@ Interview me relentlessly about every aspect of this plan until we reach a share
 
 Ask the questions one at a time.
 
-If a question can be answered by exploring the codebase, explore the codebase instead.
+If a question can be answered by exploring the codebase or the Obsidian vault (docs/vault/), explore those instead of asking.
+
+For architecture and design decisions (e.g. where code should live, how to structure modules, which patterns to use), consult the architect subagent and present its recommendation to the user alongside your own assessment.

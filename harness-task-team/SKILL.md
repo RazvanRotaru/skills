@@ -14,9 +14,9 @@ Orchestrate a 4-agent team for one task. Agents communicate through files. Never
 | Agent | Role | Artifact |
 |-------|------|----------|
 | Test Writer | Writes E2E/integration tests (red, failing) | `tests/` |
-| Adversarial Test Reviewer | Attacks the tests for gaps and false confidence | `docs/tasks/TASK-N-test-review.md` |
+| Adversarial Test Reviewer | Attacks the tests for gaps and false confidence | `docs/vault/progress/TASK-N-test-review.md` |
 | Implementer | Makes tests pass, nothing more | Code + commit |
-| Adversarial Code Reviewer | Attacks the implementation for bugs, missing cases | `docs/tasks/TASK-N-code-review.md` |
+| Adversarial Code Reviewer | Attacks the implementation for bugs, missing cases | `docs/vault/progress/TASK-N-code-review.md` |
 
 ## The Process
 
@@ -61,7 +61,7 @@ digraph task_team {
 
 ### At Task Start
 
-Update `docs/tasks/harness-progress.json` — set your task's `status` to `"in-progress"`:
+Update `docs/vault/progress/harness-progress.json` — set your task's `status` to `"in-progress"`:
 
 ```json
 {
@@ -76,7 +76,7 @@ Update `docs/tasks/harness-progress.json` — set your task's `status` to `"in-p
 
 ### At Task Completion
 
-Update your task's entry in `docs/tasks/harness-progress.json` with final state:
+Update your task's entry in `docs/vault/progress/harness-progress.json` with final state:
 
 ```json
 {
@@ -89,7 +89,7 @@ Update your task's entry in `docs/tasks/harness-progress.json` with final state:
 }
 ```
 
-Then append to `docs/tasks/harness-progress.txt`:
+Then append to `docs/vault/progress/harness-progress.txt`:
 
 ```
 [TASK-N: name] COMPLETE — 7 tests (E2E+integration), 2 test gaps fixed, 1 code issue fixed. Commit: abc1234.

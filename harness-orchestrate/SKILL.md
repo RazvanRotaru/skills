@@ -25,7 +25,7 @@ digraph orchestrate {
 
     "Read spec/goal" [shape=box];
     "Decompose into independent tasks" [shape=box];
-    "Write task spec files (docs/tasks/TASK-N-name.md)" [shape=box];
+    "Write task spec files (docs/vault/progress/TASK-N-name.md)" [shape=box];
     "Initialize harness-progress.json" [shape=box];
     "More tasks?" [shape=diamond];
     "Dispatch harness-task-team subagent" [shape=box];
@@ -33,8 +33,8 @@ digraph orchestrate {
     "Integration check + finish" [shape=box];
 
     "Read spec/goal" -> "Decompose into independent tasks";
-    "Decompose into independent tasks" -> "Write task spec files (docs/tasks/TASK-N-name.md)";
-    "Write task spec files (docs/tasks/TASK-N-name.md)" -> "Initialize harness-progress.json";
+    "Decompose into independent tasks" -> "Write task spec files (docs/vault/progress/TASK-N-name.md)";
+    "Write task spec files (docs/vault/progress/TASK-N-name.md)" -> "Initialize harness-progress.json";
     "Initialize harness-progress.json" -> "More tasks?";
     "More tasks?" -> "Dispatch harness-task-team subagent" [label="yes"];
     "Dispatch harness-task-team subagent" -> "All tasks done?";
@@ -45,9 +45,9 @@ digraph orchestrate {
 
 ## State Files: Source of Truth
 
-Before dispatching any subagent, create two state files in `docs/tasks/`:
+Before dispatching any subagent, create/update two state files in `docs/vault/progress/`:
 
-### `docs/tasks/harness-progress.json`
+### `docs/vault/progress/harness-progress.json`
 
 This is the machine-readable source of truth for task status. It is written once by the orchestrator and updated only by task team subagents — they may only update the `status` and `summary` fields. Specs are immutable: **no subagent may remove or edit task definitions**, only mark them complete.
 
@@ -59,7 +59,7 @@ This is the machine-readable source of truth for task status. It is written once
     {
       "id": "TASK-1",
       "name": "short-name",
-      "spec_file": "docs/tasks/TASK-1-short-name.md",
+      "spec_file": "docs/vault/progress/TASK-1-short-name.md",
       "status": "pending",
       "summary": null,
       "commit": null,
@@ -72,7 +72,7 @@ This is the machine-readable source of truth for task status. It is written once
 
 **Status values:** `pending` | `in-progress` | `complete` | `blocked`
 
-### `docs/tasks/harness-progress.txt`
+### `docs/vault/progress/harness-progress.txt`
 
 Human-readable log. The orchestrator writes the initial entry; each subagent appends to it. Never overwrite — always append.
 
@@ -82,7 +82,7 @@ Human-readable log. The orchestrator writes the initial entry; each subagent app
 
 ## Task Spec Format
 
-Write each task spec to `docs/tasks/TASK-N-name.md`:
+Write each task spec to `docs/vault/progress/TASK-N-name.md`:
 
 ```markdown
 # Task N: [Name]
@@ -121,9 +121,9 @@ Agent tool:
   description: "Task N: [name] — test -> review -> implement -> review"
   prompt: |
     Use the harness-task-team skill to execute this task.
-    Task spec: [paste full content of docs/tasks/TASK-N-name.md]
-    Progress JSON: docs/tasks/harness-progress.json (update your task's entry when done)
-    Progress log: docs/tasks/harness-progress.txt (append your summary when done)
+    Task spec: [paste full content of docs/vault/progress/TASK-N-name.md]
+    Progress JSON: docs/vault/progress/harness-progress.json (update your task's entry when done)
+    Progress log: docs/vault/progress/harness-progress.txt (append your summary when done)
     Working directory: [absolute path]
 ```
 
