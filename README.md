@@ -33,6 +33,10 @@ This will:
 - **brainstorm-team-session** — Iterative problem-solving loop that stress-tests a proposed solution through structured refinement. Works for any domain: infra, product, process, strategy, architecture, org design.
 - **ubiquitous-language** — Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities and proposing canonical terms. Saves to `UBIQUITOUS_LANGUAGE.md`.
 
+### Documentation & Visualization
+
+- **flow-diagram-artifact** — Build an interactive click-to-animate system/flow diagram artifact: SVG process boxes + orthogonal flows, per-node animation on selection, Ctrl/⌘ multi-select showing the union of flows, light/dark theming. Spec-driven: author a JSON graph, hydrate with `generate.py` (which lints path-through-box geometry), verify with headless screenshots.
+
 ### Development Workflow
 
 - **harness-orchestrate** — Decompose a feature or goal into independently-implementable tasks, then delegate each to an agent team.
