@@ -1,0 +1,259 @@
+<title>__TITLE__</title>
+<style>
+  /* Theme contract: LIGHT is the base, dark rides prefers-color-scheme, and the artifact
+     viewer's explicit data-theme toggle wins over both. Never hardcode palette hex in markup —
+     everything routes through these tokens (SVG strokes included, via the lane classes). */
+  :root {
+    --paper: #F2F4F8; --card: #FFFFFF; --card-2: #EDF0F7; --ink: #1E2433; --muted: #545C72;
+    --line: #A9B2C9; --accent: #4A55B8; --broker: #A97817; --worker: #1F8776;
+    --target: #A95062; --ok: #2E7D4F; --bad: #B4453A; --code-bg: #EBEEF5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #131722; --card: #1B2130; --card-2: #222A3D; --ink: #E7EAF3; --muted: #A6ADC2;
+      --line: #4A5470; --accent: #8A93EA; --broker: #D9A441; --worker: #4FB8A8;
+      --target: #C87B8B; --ok: #6CC493; --bad: #E07A6E; --code-bg: #151B2A;
+    }
+  }
+  :root[data-theme="light"] {
+    --paper: #F2F4F8; --card: #FFFFFF; --card-2: #EDF0F7; --ink: #1E2433; --muted: #545C72;
+    --line: #A9B2C9; --accent: #4A55B8; --broker: #A97817; --worker: #1F8776;
+    --target: #A95062; --ok: #2E7D4F; --bad: #B4453A; --code-bg: #EBEEF5;
+  }
+  :root[data-theme="dark"] {
+    --paper: #131722; --card: #1B2130; --card-2: #222A3D; --ink: #E7EAF3; --muted: #A6ADC2;
+    --line: #4A5470; --accent: #8A93EA; --broker: #D9A441; --worker: #4FB8A8;
+    --target: #C87B8B; --ok: #6CC493; --bad: #E07A6E; --code-bg: #151B2A;
+  }
+  html, body { background: var(--paper); }
+  body {
+    font-family: "Segoe UI", "Avenir Next", system-ui, -apple-system, sans-serif;
+    color: var(--ink); margin: 0; padding: 40px 20px 64px; line-height: 1.5;
+  }
+  main { max-width: 1150px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+             color: var(--accent); margin: 0 0 8px; }
+  h1 { font-size: 26px; font-weight: 700; letter-spacing: -.01em; margin: 0 0 6px; text-wrap: balance; }
+  .lede { color: var(--muted); max-width: 72ch; margin: 0; font-size: 14.5px; }
+  .lede b { color: var(--ink); }
+  code { font-family: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace; font-size: .87em;
+         background: var(--code-bg); padding: 1px 6px; border-radius: 4px; }
+
+  .stage { overflow-x: auto; background: var(--card); border: 1px solid var(--line);
+           border-radius: 12px; padding: 8px 4px 0; }
+  svg { display: block; min-width: 1120px; width: 100%; height: auto; }
+  #caption { min-height: 34px; padding: 6px 16px 12px; font-size: 13.5px; color: var(--muted); }
+  #caption b { color: var(--ink); }
+
+  svg text { font-family: "Segoe UI", system-ui, sans-serif; fill: var(--ink); pointer-events: none; }
+  .nodebox rect { fill: var(--card-2); stroke-width: 1.4; transition: opacity .2s; }
+  .nodebox { cursor: pointer; outline: none; }
+  .nodebox:focus-visible rect { stroke-width: 3; }
+  .nodebox.active rect { stroke-width: 3; filter: drop-shadow(0 0 6px rgba(138,147,234,.55)); }
+  .ghost rect { fill: none; stroke-dasharray: 4 4; }
+  .name  { font-size: 14.5px; font-weight: 650; }
+  .name.small { font-size: 12.5px; }
+  .ref   { font-size: 10.5px; fill: var(--muted);
+           font-family: ui-monospace, "Cascadia Code", Menlo, Consolas, monospace; }
+  .plabel{ font-size: 11px; fill: var(--muted); font-weight: 600; letter-spacing: .03em;
+           transition: opacity .2s; }
+
+  .lane-app rect     { stroke: var(--accent); }
+  .lane-broker rect  { stroke: var(--broker); }
+  .lane-worker rect  { stroke: var(--worker); }
+  .lane-target rect  { stroke: var(--target); }
+  .lane-ok rect      { stroke: var(--ok); }
+  .lane-bad rect     { stroke: var(--bad); }
+  .lane-neutral rect { stroke: var(--line); }
+  .plabel.okl { fill: var(--ok); }
+  .plabel.badl { fill: var(--bad); }
+  .flow { fill: none; stroke: var(--line); stroke-width: 2; transition: opacity .2s; }
+  .flow.ok   { stroke: var(--ok); }
+  .flow.bad  { stroke: var(--bad); }
+  .flow.warn { stroke: var(--broker); }
+  .flow.active { stroke: var(--accent); stroke-width: 2.6; stroke-dasharray: 7 6;
+                 animation: march 1s linear infinite; }
+  .flow.ok.active   { stroke: var(--ok); }
+  .flow.bad.active  { stroke: var(--bad); }
+  .flow.warn.active { stroke: var(--broker); }
+  @keyframes march { to { stroke-dashoffset: -13; } }
+  @media (prefers-reduced-motion: reduce) { .flow.active { animation: none; } }
+
+  svg.selecting .flow:not(.active)   { opacity: .15; }
+  svg.selecting .nodebox:not(.active){ opacity: .3; }
+  svg.selecting .plabel:not(.active) { opacity: .12; }
+  .plabel.active { fill: var(--ink); }
+  .pdot { fill: var(--accent); visibility: hidden; }
+  .pdot.ok { fill: var(--ok); } .pdot.bad { fill: var(--bad); } .pdot.warn { fill: var(--broker); }
+  .pdot.on { visibility: visible; }
+
+  .beats { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+           gap: 8px; margin: 0; padding: 0; list-style: none; counter-reset: beat; }
+  .beats li { background: var(--card); border: 1px solid var(--line); border-radius: 9px;
+              padding: 9px 12px 9px 40px; font-size: 13px; color: var(--muted); position: relative;
+              counter-increment: beat; cursor: pointer; transition: border-color .15s; }
+  .beats li:hover { border-color: var(--accent); }
+  .beats li.active { border-color: var(--accent); color: var(--ink); }
+  .beats li::before { content: counter(beat); position: absolute; left: 11px; top: 9px;
+              width: 20px; height: 20px; border-radius: 50%; background: var(--accent);
+              color: var(--paper); font-weight: 700; font-size: 11.5px; display: flex;
+              align-items: center; justify-content: center; }
+  .beats b, .beats code { color: var(--ink); }
+  .beats li.okb::before { background: var(--ok); }
+
+  .policy { border-left: 3px solid var(--bad); background: var(--card);
+            border-radius: 0 10px 10px 0; padding: 11px 16px; font-size: 13.5px; color: var(--muted); }
+  .policy b { color: var(--ink); }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+            padding: 10px 16px; font-size: 13px; color: var(--muted); }
+  summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+  details ul { margin: 8px 0 4px; padding-left: 18px; }
+  details li { margin: 3px 0; }
+  a { color: var(--accent); }
+</style>
+
+<main>
+  <header>
+    <p class="eyebrow">__EYEBROW__</p>
+    <h1>__HEADING__</h1>
+    <p class="lede">__LEDE__</p>
+  </header>
+
+  <div class="stage">
+  <svg id="diagram" viewBox="0 0 __CANVAS_W__ __CANVAS_H__" role="img" aria-label="__ARIA__">
+    <defs>
+__DEFS_PATHS__
+      <marker id="mFlow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#8890A6"/>
+      </marker>
+    </defs>
+
+__USES__
+
+__LABELS__
+
+__GROUPS__
+
+__NODES__
+
+    <g id="dots"></g>
+  </svg>
+  <div id="caption">__DEFAULT_CAPTION__</div>
+  </div>
+
+__BEATS__
+
+__EXTRAS__
+</main>
+
+<script>
+(function () {
+  var SVG = document.getElementById("diagram");
+  var CAPTION = document.getElementById("caption");
+  var DEFAULT_CAPTION = CAPTION.textContent;
+  var REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var NODE_PATHS = __JS_NODE_PATHS__;
+  var DOT_KIND = __JS_DOT_KIND__;
+  var NAMES = __JS_NAMES__;
+  var CAPTIONS = __JS_CAPTIONS__;
+  var PATH_IDS = __JS_PATH_IDS__;
+
+  var selected = new Set();
+  var dotsLayer = document.getElementById("dots");
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var XLINK = "http://www.w3.org/1999/xlink";
+  var dotAnims = {};
+
+  PATH_IDS.forEach(function (pathId) {
+    var dot = document.createElementNS(SVGNS, "circle");
+    dot.setAttribute("r", "4.5");
+    dot.setAttribute("class", "pdot " + (DOT_KIND[pathId] || ""));
+    var anim = document.createElementNS(SVGNS, "animateMotion");
+    anim.setAttribute("dur", "1.6s");
+    anim.setAttribute("begin", "indefinite");
+    anim.setAttribute("repeatCount", "indefinite");
+    var mpath = document.createElementNS(SVGNS, "mpath");
+    mpath.setAttributeNS(XLINK, "href", "#" + pathId);
+    anim.appendChild(mpath);
+    dot.appendChild(anim);
+    dotsLayer.appendChild(dot);
+    dotAnims[pathId] = { dot: dot, anim: anim };
+  });
+
+  function render() {
+    SVG.querySelectorAll(".active").forEach(function (el) { el.classList.remove("active"); });
+    document.querySelectorAll("#beats li.active").forEach(function (el) { el.classList.remove("active"); });
+    Object.keys(dotAnims).forEach(function (pathId) {
+      dotAnims[pathId].dot.classList.remove("on");
+      try { dotAnims[pathId].anim.endElement(); } catch (ignored) {}
+    });
+    if (selected.size === 0) {
+      SVG.classList.remove("selecting");
+      CAPTION.innerHTML = DEFAULT_CAPTION;
+      return;
+    }
+    SVG.classList.add("selecting");
+    var pathUnion = new Set();
+    selected.forEach(function (node) {
+      var box = SVG.querySelector('.nodebox[data-node="' + node + '"]');
+      if (box) box.classList.add("active");
+      var beat = document.querySelector('#beats li[data-node="' + node + '"]');
+      if (beat) beat.classList.add("active");
+      (NODE_PATHS[node] || []).forEach(function (pathId) { pathUnion.add(pathId); });
+    });
+    pathUnion.forEach(function (pathId) {
+      SVG.querySelectorAll('[data-path="' + pathId + '"]').forEach(function (el) {
+        el.classList.add("active");
+      });
+      var entry = dotAnims[pathId];
+      if (entry && !REDUCED) {
+        entry.dot.classList.add("on");
+        entry.anim.beginElement();
+      }
+    });
+    if (selected.size === 1) {
+      var only = selected.values().next().value;
+      CAPTION.innerHTML = CAPTIONS[only] || DEFAULT_CAPTION;
+    } else {
+      var names = [];
+      selected.forEach(function (node) { names.push(NAMES[node] || node); });
+      CAPTION.innerHTML = "<b>" + selected.size + " nodes selected</b> — union of flows for " +
+        names.join(", ") + ". Ctrl/⌘-click a node to remove it.";
+    }
+  }
+
+  function handle(node, additive) {
+    if (additive) {
+      if (selected.has(node)) { selected.delete(node); } else { selected.add(node); }
+    } else if (selected.size === 1 && selected.has(node)) {
+      selected.clear();
+    } else {
+      selected.clear();
+      selected.add(node);
+    }
+    render();
+  }
+
+  function isAdditive(event) { return event.ctrlKey || event.metaKey; }
+
+  SVG.addEventListener("click", function (event) {
+    var box = event.target.closest(".nodebox");
+    if (box) { handle(box.getAttribute("data-node"), isAdditive(event)); }
+    else if (!isAdditive(event)) { selected.clear(); render(); }
+  });
+  SVG.querySelectorAll(".nodebox").forEach(function (box) {
+    box.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        handle(box.getAttribute("data-node"), isAdditive(event));
+      }
+    });
+  });
+  document.querySelectorAll("#beats li").forEach(function (item) {
+    item.addEventListener("click", function (event) {
+      handle(item.getAttribute("data-node"), isAdditive(event));
+    });
+  });
+})();
+</script>
